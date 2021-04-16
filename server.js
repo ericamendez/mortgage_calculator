@@ -1,34 +1,28 @@
-// requiring express module
 const express = require('express')
-// assigning the express module object to app
+
 const app = express()
-// assigning MongoClient to mongodb MongoClient which is a module
+
 const MongoClient = require('mongodb').MongoClient
-// assigning PORT  2121
+
 const PORT = 3000
 
 const mongo = require('mongodb')
+
 // reuiring dot env to env variables
 require('dotenv').config()
 
-// db is global variable
 let db,
     dbConnectionStr = process.env.DB_STRING,
     dbName = 'mortgage_calc'
 
-// connecting to the data base and uses a promise
 MongoClient.connect(dbConnectionStr, { useUnifiedTopology: true })
     .then(client => {
         console.log(`Connected to ${dbName} Database`)
         db = client.db(dbName)
     })
 
-// MIDDEL WIRE
-
-// This tells Express we’re using EJS as the template engine.
 app.set('view engine', 'ejs')
 
-// tells express to render the public folder
 app.use(express.static('public'))
 
 // does what body parser did
@@ -39,8 +33,7 @@ app.use(express.json())
 
 
 app.get('/', (request, response) => {
-    console.log(db)
-    // access rappers collection sorts likes from descending order
+    // Access the home collection in mortgage_calc DB
     db.collection('home').find().toArray()
         .then(data => {
           console.log(data, 'the fish')
@@ -76,7 +69,7 @@ app.delete('/deleteMortgageCalculation', (request, response) => {
     // look up stage name in the db and delete them
     console.log(request.body, 'homdelteBody')
     console.log('This is the IDDDDDDDD' + new mongo.ObjectId(request.body.id))
-    db.collection('homeInfo').deleteOne( {"_id": new mongo.ObjectId(request.body.id)})
+    db.collection('home').deleteOne( {"_id": new mongo.ObjectId(request.body.id)})
         .then(result => {
             console.log('Home Calculation Deleted')
             response.json('Home Calculation Deleted')
@@ -93,7 +86,7 @@ app.post('/postMortgageCalculation', (request, response) => {
   console.log({p, i, n})
   //monthly mortgage payment
   const m = Math.round(p * i * (Math.pow(1 + i, n)) / (Math.pow(1 + i, n) - 1));
-    db.collection('homeInfo').insertOne({
+    db.collection('home').insertOne({
       ...request.body,
       total: m
     })
