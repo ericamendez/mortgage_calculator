@@ -13,9 +13,8 @@ require('dotenv').config()
 
 // db is global variable
 let db,
-    // getting connection string from env file
     dbConnectionStr = process.env.DB_STRING,
-    dbName = 'MortgageCalculator'
+    dbName = 'mortgage_calc'
 
 // connecting to the data base and uses a promise
 MongoClient.connect(dbConnectionStr, { useUnifiedTopology: true })
@@ -40,8 +39,9 @@ app.use(express.json())
 
 
 app.get('/', (request, response) => {
+    console.log(db)
     // access rappers collection sorts likes from descending order
-    db.collection('homeInfo').find().toArray()
+    db.collection('home').find().toArray()
         .then(data => {
           console.log(data, 'the fish')
             // rendering data from data base to ejs
